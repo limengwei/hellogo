@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -10,18 +11,21 @@ import (
 )
 
 const (
+	PORT       = ":80"
 	UPLOAD_DIR = "./uploads"
 	TPL_DIR    = "./views"
 )
 
 func main() {
+
 	http.HandleFunc("/", helloHandler)
 	http.HandleFunc("/up", uploadHandler)
 	http.HandleFunc("/view", viewHandler)
 	http.HandleFunc("/spider", spiderHandler)
-	err := http.ListenAndServe(":80", nil)
+	err := http.ListenAndServe(PORT, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err.Error())
+		return
 	}
 
 }
