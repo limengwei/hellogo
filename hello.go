@@ -10,6 +10,9 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
 )
 
 const (
@@ -21,6 +24,7 @@ const (
 )
 
 func main() {
+	time.Now().Minute()
 
 	http.HandleFunc("/", helloHandler)
 	http.HandleFunc("/up", uploadHandler)
@@ -110,8 +114,25 @@ func spiderHandler(w http.ResponseWriter, r *http.Request) {
 
 //解析HTML
 func imgSpiderHandler(w http.ResponseWriter, r *http.Request) {
+	url := "http://mt.locojoy.com/chengka"
+	index := r.FormValue("index")
 
-	doc, err := goquery.NewDocument("http://mt.locojoy.com/chengka/")
+	var i int
+	if strings.EqualFold(index, "") {
+		i = 0
+	} else {
+		i, _ = strconv.Atoi(index)
+	}
+
+	fmt.Println(strconv.Itoa(i))
+
+	if i > 1 {
+		url = url + "/" + strconv.Itoa(i) + ".html"
+	}
+
+	fmt.Println(url)
+
+	doc, err := goquery.NewDocument(url)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -130,6 +151,7 @@ func imgSpiderHandler(w http.ResponseWriter, r *http.Request) {
 
 		}
 	})
+
 	io.WriteString(w, doc.Text())
 }
 
@@ -152,6 +174,8 @@ func download(url string) {
 	}
 
 	io.Copy(temp, res.Body)
+
+	defer temp.Close()
 }
 
 //输出HTML
