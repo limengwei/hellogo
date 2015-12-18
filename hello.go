@@ -152,7 +152,8 @@ func imgSpiderHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	})
 
-	io.WriteString(w, doc.Text())
+	x, _ := doc.Html()
+	io.WriteString(w, x)
 }
 
 //下载
