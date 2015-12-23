@@ -40,11 +40,25 @@ func main() {
 }
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "hello")
+	//以静态文件输出
+	//renderHtml(w, TPL_DIR+"/home.html")
+
+	//输出模板文件
+	t, err := template.ParseFiles(TPL_DIR+"/base.html", TPL_DIR+"/index.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	t.ExecuteTemplate(w, "header", nil)
+	t.Execute(w, nil)
+	return
 }
 
 //get输出上传页面 post上传文件
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
+
+	log.Println(time.Now())
+
 	if r.Method == "GET" {
 		//使用Go模板库输出
 		t, err := template.ParseFiles(TPL_DIR + "/upload.html")
