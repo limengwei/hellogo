@@ -20,6 +20,7 @@ const (
 	UPLOAD_DIR   = "./uploads"
 	TPL_DIR      = "./views"
 	DOWNLOAD_DIR = "./downloads"
+	DATA_DIR     = "./data"
 	TimeoutLimit = 10
 )
 
@@ -31,6 +32,8 @@ func main() {
 	http.HandleFunc("/view", viewHandler)
 	http.HandleFunc("/spider", spiderHandler)
 	http.HandleFunc("/img", imgSpiderHandler)
+	http.HandleFunc("/editor", editorHandler)
+
 	err := http.ListenAndServe(PORT, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe:", err.Error())
@@ -52,6 +55,30 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 	t.ExecuteTemplate(w, "header", nil)
 	t.Execute(w, nil)
 	return
+}
+
+func editorHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		t, err := template.ParseFiles(TPL_DIR+"/base.html", TPL_DIR+"/editor.html")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		t.ExecuteTemplate(w, "header", nil)
+		t.Execute(w, nil)
+		return
+	}
+
+	if r.Method == "POST" {
+		fileName := DATA_DIR + "/" + strconv.Itoa(time.Now().Nanosecond()) + ".txt"
+		t, err := os.Create(fileName)
+		if err != nil {
+
+		}
+		defer t.Close()
+
+		io.Copy(t, strings.NewReader(r.FormValue("title")+"\n\n"+r.FormValue("content")))
+	}
 }
 
 //get输出上传页面 post上传文件
