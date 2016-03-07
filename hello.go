@@ -33,6 +33,7 @@ func main() {
 	http.HandleFunc("/spider", spiderHandler)
 	http.HandleFunc("/img", imgSpiderHandler)
 	http.HandleFunc("/editor", editorHandler)
+	http.HandleFunc("/resume", resumeHandler)
 
 	err := http.ListenAndServe(PORT, nil)
 	if err != nil {
@@ -228,4 +229,15 @@ func renderHtml(w http.ResponseWriter, htmlPath string) {
 		return
 	}
 	io.WriteString(w, string(s))
+}
+
+//个人简历
+func resumeHandler(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles(TPL_DIR+"/base.html", TPL_DIR+"/resume.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	t.ExecuteTemplate(w, "header", nil)
+	t.Execute(w, nil)
 }
